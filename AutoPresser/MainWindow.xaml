@@ -1,0 +1,130 @@
+﻿<Window x:Class="AutoPresser.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        mc:Ignorable="d"
+        Title="AutoPresser" Height="820" Width="1040"
+        Background="{DynamicResource ApplicationBackgroundBrush}"
+        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+        MinHeight="700" MinWidth="900"
+        WindowStartupLocation="CenterScreen" Icon="Assets/AutoPresser.ico">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                <TextBlock Text="AutoPresser" FontSize="28" FontWeight="SemiBold" />
+                <TextBlock Text="Global keyboard and mouse bindings" Opacity="0.7" Margin="0,4,0,0" />
+            </StackPanel>
+            <ui:ToggleSwitch x:Name="MasterSwitch"
+                             Grid.Column="1"
+                             VerticalAlignment="Center"
+                             Content="Enabled"
+                             Checked="MasterSwitch_Checked"
+                             Unchecked="MasterSwitch_Unchecked" />
+        </Grid>
+
+        <ui:Card Grid.Row="1" Padding="20" Margin="0,0,0,12">
+            <StackPanel>
+                <TextBlock Text="Profiles" FontSize="17" FontWeight="SemiBold" Margin="0,0,0,10" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ComboBox x:Name="ProfileComboBox"
+                              Grid.Column="0"
+                              MinHeight="36"
+                              VerticalContentAlignment="Center"
+                              DisplayMemberPath="Name"
+                              SelectionChanged="ProfileComboBox_SelectionChanged" />
+                    <ui:Button x:Name="DeleteProfileButton" Grid.Column="1" Content="Delete" Click="DeleteProfileButton_Click" Margin="8,0,0,0" />
+                </Grid>
+                <Grid Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="ProfileNameTextBox"
+                             Grid.Column="0"
+                             MinHeight="36"
+                             VerticalContentAlignment="Center"
+                             Padding="8,4"
+                             ToolTip="Enter a name for a new profile or to rename the selected profile" />
+                    <ui:Button x:Name="NewProfileButton" Grid.Column="1" Content="New Profile" Click="NewProfileButton_Click" Margin="8,0,0,0" />
+                    <ui:Button x:Name="RenameProfileButton" Grid.Column="2" Content="Rename" Click="RenameProfileButton_Click" Margin="8,0,0,0" />
+                </Grid>
+                <TextBlock x:Name="ConfigurationPathText"
+                           Margin="0,10,0,0"
+                           TextWrapping="Wrap"
+                           Opacity="0.65"
+                           FontSize="11" />
+                <TextBlock Text="Switching profiles temporarily suspends bindings and restores their previous enabled state."
+                           Margin="0,5,0,0"
+                           TextWrapping="Wrap"
+                           Opacity="0.7" />
+            </StackPanel>
+        </ui:Card>
+
+        <ui:Card Grid.Row="2" Padding="18" Margin="0,0,0,16">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <DockPanel Grid.Row="0" Margin="0,0,0,10" LastChildFill="False">
+                    <StackPanel DockPanel.Dock="Left">
+                        <TextBlock Text="Bindings" FontSize="17" FontWeight="SemiBold" />
+                        <TextBlock Text="Add and configure actions for the selected profile." Opacity="0.7" Margin="0,3,0,0" />
+                        <TextBlock x:Name="BindingSummaryText" Text="0 of 0 bindings enabled" Opacity="0.85" Margin="0,5,0,0" FontSize="12" />
+                    </StackPanel>
+                    <ui:Button x:Name="RemoveBindingButton" Content="Remove" Click="RemoveBindingButton_Click" DockPanel.Dock="Right" Margin="8,0,0,0" />
+                    <ui:Button x:Name="EditBindingButton" Content="Edit" Click="EditBindingButton_Click" DockPanel.Dock="Right" Margin="8,0,0,0" />
+                    <ui:Button x:Name="AddBindingButton" Content="Add Binding" Click="AddBindingButton_Click" DockPanel.Dock="Right" />
+                </DockPanel>
+                <DataGrid x:Name="BindingsGrid" Grid.Row="1" MinHeight="180" MaxHeight="360"
+                          AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
+                          SelectionMode="Single" SelectionUnit="FullRow" IsReadOnly="False"
+                          BeginningEdit="BindingsGrid_BeginningEdit"
+                          CellEditEnding="BindingsGrid_CellEditEnding"
+                          SelectionChanged="BindingsGrid_SelectionChanged"
+                          HeadersVisibility="Column" GridLinesVisibility="Horizontal"
+                          RowHeaderWidth="0" CanUserReorderColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridCheckBoxColumn Header="On" Binding="{Binding IsEnabled, UpdateSourceTrigger=PropertyChanged}" Width="45" />
+                        <DataGridTextColumn Header="Trigger" Binding="{Binding TriggerDisplay}" IsReadOnly="True" Width="90" />
+                        <DataGridTextColumn Header="Modifiers" Binding="{Binding ModifiersDisplay}" IsReadOnly="True" Width="105" />
+                        <DataGridTextColumn Header="Action" Binding="{Binding ActionDisplay}" IsReadOnly="True" Width="105" />
+                        <DataGridTextColumn Header="Device" Binding="{Binding Target.DeviceDisplay}" IsReadOnly="True" Width="90" />
+                        <DataGridTextColumn Header="Mouse button" Binding="{Binding Target.MouseButtonDisplay}" IsReadOnly="True" Width="110" />
+                        <DataGridTextColumn Header="Target key" Binding="{Binding Target.KeyDisplay}" IsReadOnly="True" Width="95" />
+                        <DataGridTextColumn Header="Interval" Binding="{Binding IntervalMilliseconds}" IsReadOnly="True" Width="75" />
+                        <DataGridTextColumn Header="Repeats" Binding="{Binding RepeatCount}" IsReadOnly="True" Width="75" />
+                    </DataGrid.Columns>
+                </DataGrid>
+                <StackPanel Grid.Row="2" Margin="0,10,0,0">
+                    <TextBlock x:Name="StatusText" Text="Bindings disabled" FontSize="15" />
+                    <TextBlock Text="Emergency stop: Ctrl+Shift+F12" Margin="0,6,0,0" Opacity="0.7" />
+                </StackPanel>
+            </Grid>
+        </ui:Card>
+
+        <DockPanel Grid.Row="3" LastChildFill="False">
+            <TextBlock x:Name="FooterStatusText" Text="Master switch is off" VerticalAlignment="Center" Opacity="0.7" />
+            <ui:Button Content="Binding Test" Click="BindingTestButton_Click" DockPanel.Dock="Right" Margin="16,0,0,0" />
+        </DockPanel>
+    </Grid>
+</Window>
